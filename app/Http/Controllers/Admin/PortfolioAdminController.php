@@ -16,58 +16,58 @@ class PortfolioAdminController extends Controller
     {
         $hero = SiteSetting::valueFor('hero', [
             'greeting' => "Hi, I'm",
-            'name' => 'Alex Johnson',
+            'name' => 'Pranil Maharjan',
             'tagline' => 'Full-Stack Developer & UI Enthusiast',
             'desc' => 'I craft beautiful, performant web applications using modern PHP and JavaScript. Passionate about clean code, elegant architecture, and exceptional user experiences.',
         ]);
 
         $about = SiteSetting::valueFor('about', [
             'intro' => 'I am a passionate full-stack developer with 5+ years of experience building web applications. I specialize in Laravel and modern PHP stacks, turning complex problems into simple, beautiful solutions.',
-            'second' => 'When not coding, I enjoy hiking, reading sci-fi novels, and experimenting with new recipes.',
+            'second' => 'When not coding, I enjoy hiking, watching movies and series and also live to play indoor or outdoor games.',
             'details' => [
-                ['icon' => '📍', 'text' => 'San Francisco, CA'],
-                ['icon' => '✉️', 'text' => 'alex@example.com'],
-                ['icon' => '📞', 'text' => '+1 (555) 123-4567'],
+                ['icon' => '📍', 'text' => 'Kirtipur-3, Kathmandu, Nepal'],
+                ['icon' => '✉️', 'text' => 'pranilmaharjan12@gmail.com'],
+                ['icon' => '📞', 'text' => '+977 9763373854'],
             ],
         ]);
 
         $contact = SiteSetting::valueFor('contact', [
-            'location' => 'San Francisco, CA',
-            'email' => 'alex@example.com',
-            'phone' => '+1 (555) 123-4567',
+            'location' => 'Kirtipur-3, Kathmandu, Nepal',
+            'email' => 'pranilmaharjan12@gmail.com',
+            'phone' => '+977 9763373854',
         ]);
 
         $footer = SiteSetting::valueFor('footer', [
-            'year' => now()->year,
-            'brand' => 'AlexDev',
+           'year' => now()->year,
+            'brand' => 'Pranil Maharjan',
             'text' => 'Built with Laravel.',
             'links' => [
-                ['label' => 'GitHub', 'url' => '#'],
-                ['label' => 'LinkedIn', 'url' => '#'],
-                ['label' => 'Twitter', 'url' => '#'],
+                ['label' => 'GitHub', 'url' => 'https://github.com/pranil'],
+                ['label' => 'LinkedIn', 'url' => 'https://linkedin.com/in/pranilmaharjan'],
+                ['label' => 'Instagram', 'url' => 'https://www.instagram.com/pranilmaharjan12'],
             ],
         ]);
 
         $education = SiteSetting::valueFor('education', [
             [
                 'type' => 'SCHOOL',
-                'school' => 'Springfield High School',
-                'location' => 'Namkha-4, Humla',
-                'gpa' => '3.70',
+                'school' => 'Hill-Town Higher Secondary School',
+                'location' => 'kirtipur, Kathmandu',
+                'gpa' => '3.50',
                 'status' => 'DONE',
             ],
             [
                 'type' => '+2',
-                'school' => 'Central Higher Secondary',
-                'location' => 'Basundhara, Kathmandu',
-                'gpa' => '3.42',
+                'school' => 'DAV',
+                'location' => 'Jawalakhel, Lalitpur',
+                'gpa' => '3.20',
                 'status' => 'DONE',
             ],
             [
                 'type' => 'BACHELOR',
-                'school' => 'State University',
+                'school' => 'Asian college of higher studies',
                 'location' => 'Ekantakuna, Lalitpur',
-                'gpa' => '3.65',
+                'gpa' => '',
                 'status' => 'ONGOING',
             ],
         ]);

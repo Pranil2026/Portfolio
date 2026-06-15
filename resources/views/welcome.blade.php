@@ -31,18 +31,7 @@
             </div>
         </div>
         <div class="hero-stats">
-            <div>
-                <span>04+</span>
-                <p>Years of experience</p>
-            </div>
-            <div>
-                <span>25+</span>
-                <p>Projects completed</p>
-            </div>
-            <div>
-                <span>10+</span>
-                <p>Happy clients</p>
-            </div>
+            
         </div>
     </section>
 
