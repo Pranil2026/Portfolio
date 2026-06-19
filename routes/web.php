@@ -2,11 +2,15 @@
 
 use App\Http\Controllers\Admin\PortfolioAdminController;
 use App\Http\Controllers\PortfolioController;
+
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [PortfolioController::class, 'index']);
+
+// Public contact POST route (handled by PortfolioController)
+Route::post('contact', [PortfolioController::class, 'storeMessage'])->name('contact.send');
 
 // Global login route used by Laravel's auth middleware — redirect to admin login
 Route::get('login', function () {
@@ -53,6 +57,9 @@ Route::prefix('admin')->group(function () {
         Route::post('testimonials', [PortfolioAdminController::class, 'storeTestimonial'])->name('admin.testimonials.store');
         Route::put('testimonials/{testimonial}', [PortfolioAdminController::class, 'updateTestimonial'])->name('admin.testimonials.update');
         Route::delete('testimonials/{testimonial}', [PortfolioAdminController::class, 'destroyTestimonial'])->name('admin.testimonials.destroy');
+
+        // Messages
+        Route::delete('messages/{message}', [PortfolioAdminController::class, 'destroyMessage'])->name('admin.messages.destroy');
 
         // Logout
         Route::post('logout', function (Request $request) {

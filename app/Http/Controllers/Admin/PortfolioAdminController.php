@@ -8,6 +8,7 @@ use App\Models\Service;
 use App\Models\Skill;
 use App\Models\SiteSetting;
 use App\Models\Testimonial;
+use App\Models\Message;
 use Illuminate\Http\Request;
 
 class PortfolioAdminController extends Controller
@@ -82,7 +83,14 @@ class PortfolioAdminController extends Controller
             'projects' => Project::orderBy('position', 'asc')->get(),
             'services' => Service::orderBy('position', 'asc')->get(),
             'testimonials' => Testimonial::orderBy('position', 'asc')->get(),
+            'messages' => Message::orderBy('created_at', 'desc')->get(),
         ]);
+    }
+
+    public function destroyMessage(Message $message)
+    {
+        Message::destroy($message->id);
+        return redirect()->back()->with('success', 'Message deleted.');
     }
 
     public function updateSetting(Request $request, string $section)

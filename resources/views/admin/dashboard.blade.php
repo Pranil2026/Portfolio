@@ -130,6 +130,7 @@
                         <li><a href="#services" class="admin-nav-link">Services</a></li>
                         <li><a href="#testimonials" class="admin-nav-link">Testimonials</a></li>
                         <li><a href="#contact" class="admin-nav-link">Contact</a></li>
+                        <li><a href="#footer" class="admin-nav-link">Footer</a></li>
                     </ul>
                 </nav>
             </div>
@@ -150,6 +151,36 @@
                         @endforeach
                     </ul>
                 </div>
+            @endif
+        </section>
+
+        <section id="messages" class="admin-section">
+            <h2>Contact Messages</h2>
+            @if($messages->isEmpty())
+                <p class="admin-note">No messages yet.</p>
+            @else
+                <table class="admin-table">
+                    <thead>
+                        <tr><th>Name</th><th>Email</th><th>Message</th><th>Received</th><th>Actions</th></tr>
+                    </thead>
+                    <tbody>
+                        @foreach($messages as $msg)
+                            <tr>
+                                <td>{{ $msg->name }}</td>
+                                <td>{{ $msg->email }}</td>
+                                <td style="max-width:480px; white-space:pre-wrap;">{{ $msg->message }}</td>
+                                <td>{{ $msg->created_at->diffForHumans() }}</td>
+                                <td class="admin-actions">
+                                    <form action="{{ route('admin.messages.destroy', $msg) }}" method="post" onsubmit="return confirm('Delete this message?');">
+                                        @csrf
+                                        @method('delete')
+                                        <button type="submit" class="button-delete">Delete</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
             @endif
         </section>
 

@@ -7,6 +7,8 @@ use App\Models\Service;
 use App\Models\Skill;
 use App\Models\SiteSetting;
 use App\Models\Testimonial;
+use App\Models\Message;
+use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 
 class PortfolioController extends Controller
@@ -124,5 +126,18 @@ class PortfolioController extends Controller
             'testimonials',
             'footer'
         ));
+    }
+
+    public function storeMessage(Request $request)
+    {
+        $data = $request->validate([
+            'name' => 'required|string|max:120',
+            'email' => 'required|email|max:120',
+            'message' => 'required|string|max:2000',
+        ]);
+
+        Message::create($data);
+
+        return back()->with('status', 'Message sent.');
     }
 }

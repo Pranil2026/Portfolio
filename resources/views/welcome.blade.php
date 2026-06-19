@@ -185,7 +185,8 @@
                     <span>{{ $contact['phone'] }}</span>
                 </div>
             </div>
-            <form class="contact-form" onsubmit="showToast(); return false;">
+            <form class="contact-form" method="post" action="{{ route('contact.send') }}">
+                @csrf
                 <label>
                     Name
                     <input type="text" name="name" placeholder="Your name" required />
@@ -200,6 +201,9 @@
                 </label>
                 <button type="submit">Send message</button>
             </form>
+            @if(session('status'))
+                <script>document.addEventListener('DOMContentLoaded', function(){ showToast(); });</script>
+            @endif
         </div>
     </section>
 
