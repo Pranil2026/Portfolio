@@ -57,6 +57,7 @@
         .admin-table {
             width: 100%;
             border-collapse: collapse;
+            table-layout: fixed;
         }
         .admin-table th,
         .admin-table td {
@@ -64,15 +65,25 @@
             border-bottom: 1px solid rgba(15,23,42,0.08);
             font-size: 0.93rem;
             color: #374151;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
         .admin-table th {
             text-align: left;
             background: #f8fafc;
         }
+        .admin-table td:nth-child(3) {
+            white-space: normal;
+        }
+        .admin-table td:nth-child(5) {
+            white-space: nowrap;
+        }
         .admin-actions {
             display: flex;
             gap: 0.5rem;
             flex-wrap: wrap;
+            justify-content: flex-end;
         }
         .admin-actions button {
             border-radius: 999px;
@@ -104,6 +115,71 @@
             background: #fee2e2;
             color: #991b1b;
         }
+        .message-preview {
+            max-width: 250px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.4);
+        }
+        .modal-content {
+            background-color: #fff;
+            margin: 5% auto;
+            padding: 2rem;
+            border: 1px solid rgba(15,23,42,0.08);
+            border-radius: 24px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 18px 50px rgba(15,23,42,0.12);
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+        .modal-header h2 {
+            margin: 0;
+            font-size: 1.35rem;
+            color: #111827;
+        }
+        .close-modal {
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #6b7280;
+            border: none;
+            background: none;
+        }
+        .close-modal:hover {
+            color: #111827;
+        }
+        .modal-field {
+            margin-bottom: 1.5rem;
+        }
+        .modal-field label {
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+        .modal-field p {
+            margin: 0;
+            color: #111827;
+            line-height: 1.6;
+            word-wrap: break-word;
+            white-space: pre-wrap;
+        }
     </style>
 </head>
 <body>
@@ -112,6 +188,10 @@
             <div class="logo">Portfolio Admin</div>
             <div class="navbar-menu">
                 <a href="{{ url('/') }}">View public site</a>
+                <form action="{{ route('admin.logout') }}" method="post" style="display:inline;">
+                    @csrf
+                    <button type="submit" class="button-primary" style="margin-left:12px;">Logout</button>
+                </form>
             </div>
         </div>
     </div>
@@ -130,15 +210,17 @@
                         <li><a href="#services" class="admin-nav-link">Services</a></li>
                         <li><a href="#testimonials" class="admin-nav-link">Testimonials</a></li>
                         <li><a href="#contact" class="admin-nav-link">Contact</a></li>
+                        <li><a href="#messages" class="admin-nav-link">Contact Messages</a></li>
                         <li><a href="#footer" class="admin-nav-link">Footer</a></li>
                     </ul>
                 </nav>
             </div>
         </aside>
+        
         <div class="admin-content">
         <section id="hero" class="admin-header admin-section">
-            <h1>Content Management</h1>
             <p class="admin-note">Manage hero text, about details, contact information, footer links, skills, projects, services, and testimonials from one admin screen.</p>
+            <p class="admin-note">You can manage all your portfolio content from this dashboard.</p>
             @if(session('success'))
                 <div class="admin-note admin-success">{{ session('success') }}</div>
             @endif
@@ -154,35 +236,15 @@
             @endif
         </section>
 
-        <section id="messages" class="admin-section">
-            <h2>Contact Messages</h2>
-            @if($messages->isEmpty())
-                <p class="admin-note">No messages yet.</p>
-            @else
                 <table class="admin-table">
-                    <thead>
-                        <tr><th>Name</th><th>Email</th><th>Message</th><th>Received</th><th>Actions</th></tr>
                     </thead>
                     <tbody>
                         @foreach($messages as $msg)
-                            <tr>
-                                <td>{{ $msg->name }}</td>
-                                <td>{{ $msg->email }}</td>
-                                <td style="max-width:480px; white-space:pre-wrap;">{{ $msg->message }}</td>
-                                <td>{{ $msg->created_at->diffForHumans() }}</td>
-                                <td class="admin-actions">
-                                    <form action="{{ route('admin.messages.destroy', $msg) }}" method="post" onsubmit="return confirm('Delete this message?');">
                                         @csrf
                                         @method('delete')
                                         <button type="submit" class="button-delete">Delete</button>
-                                    </form>
                                 </td>
                             </tr>
-                        @endforeach
-                    </tbody>
-                </table>
-            @endif
-        </section>
 
         <section class="admin-section">
             <h2>Hero Section</h2>
@@ -254,58 +316,8 @@
             </form>
         </section>
 
-        <section id="contact" class="admin-section">
-            <h2>Contact Settings</h2>
-            <form class="admin-form" action="{{ route('admin.settings.update', 'contact') }}" method="post">
-                @csrf
-                <label>Location</label>
-                <input type="text" name="location" value="{{ old('location', $contact['location']) }}" />
-
-                <label>Email</label>
-                <input type="email" name="email" value="{{ old('email', $contact['email']) }}" />
-
-                <label>Phone</label>
-                <input type="text" name="phone" value="{{ old('phone', $contact['phone']) }}" />
-
-                <button type="submit" class="button-primary">Save Contact</button>
-            </form>
-        </section>
-
-        <section id="footer" class="admin-section">
-            <h2>Footer Settings</h2>
-            <form class="admin-form" action="{{ route('admin.settings.update', 'footer') }}" method="post">
-                @csrf
-                <label>Brand</label>
-                <input type="text" name="brand" value="{{ old('brand', $footer['brand']) }}" required />
-
-                <label>Year</label>
-                <input type="number" name="year" value="{{ old('year', $footer['year']) }}" required />
-
-                <label>Footer Text</label>
-                <textarea name="text" rows="2" required>{{ old('text', $footer['text']) }}</textarea>
-
-                <label>Link 1 label</label>
-                <input type="text" name="link1_label" value="{{ old('link1_label', $footer['links'][0]['label'] ?? '') }}" />
-                <label>Link 1 URL</label>
-                <input type="url" name="link1_url" value="{{ old('link1_url', $footer['links'][0]['url'] ?? '') }}" />
-
-                <label>Link 2 label</label>
-                <input type="text" name="link2_label" value="{{ old('link2_label', $footer['links'][1]['label'] ?? '') }}" />
-                <label>Link 2 URL</label>
-                <input type="url" name="link2_url" value="{{ old('link2_url', $footer['links'][1]['url'] ?? '') }}" />
-
-                <label>Link 3 label</label>
-                <input type="text" name="link3_label" value="{{ old('link3_label', $footer['links'][2]['label'] ?? '') }}" />
-                <label>Link 3 URL</label>
-                <input type="url" name="link3_url" value="{{ old('link3_url', $footer['links'][2]['url'] ?? '') }}" />
-
-                <button type="submit" class="button-primary">Save Footer</button>
-            </form>
-        </section>
-
-        <section class="admin-section admin-grid">
-            <div id="skills">
-                <h2>Skills</h2>
+        <section id="skills" class="admin-section">
+                <h2>Skills Section</h2>
                 <form class="admin-form" action="{{ route('admin.skills.store') }}" method="post">
                     @csrf
                     <label>Group</label>
@@ -460,7 +472,127 @@
                         @endforeach
                     </tbody>
                 </table>
+        </section>
+
+        <section id="contact" class="admin-section">
+            <h2>Contact Section</h2>
+            <form class="admin-form" action="{{ route('admin.settings.update', 'contact') }}" method="post">
+                @csrf
+                <label>Location</label>
+                <input type="text" name="location" value="{{ old('location', $contact['location']) }}" />
+
+                <label>Email</label>
+                <input type="email" name="email" value="{{ old('email', $contact['email']) }}" />
+
+                <label>Phone</label>
+                <input type="text" name="phone" value="{{ old('phone', $contact['phone']) }}" />
+
+                <button type="submit" class="button-primary">Save Contact</button>
+            </form>
+        </section>
+
+         <section id="messages" class="admin-section">
+            <h2>Contact Messages</h2>
+            @if($messages->isEmpty())
+                <p class="admin-note">No messages yet.</p>
+            @else
+                <table class="admin-table">
+                    <thead>
+                        <tr><th>Name</th><th>Email</th><th>Message</th><th>Received</th><th>Actions</th></tr>
+                    </thead>
+                    <tbody>
+                        @foreach($messages as $msg)
+                            <tr>
+                                <td>{{ $msg->name }}</td>
+                                <td>{{ $msg->email }}</td>
+                                <td><div class="message-preview">{{ $msg->message }}</div></td>
+                                <td>{{ $msg->created_at->diffForHumans() }}</td>
+                                <td class="admin-actions">
+                                    <button type="button" class="button-update" onclick="openMessageModal({{ json_encode(['name' => $msg->name, 'email' => $msg->email, 'message' => $msg->message, 'id' => $msg->id]) }})">View</button>
+                                    <form action="{{ route('admin.messages.destroy', $msg) }}" method="post" onsubmit="return confirm('Delete this message?');">
+                                        @csrf
+                                        @method('delete')
+                                        <button type="submit" class="button-delete">Delete</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            @endif
+        </section>
+
+        <div id="messageModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>Full Message</h2>
+                    <button class="close-modal" onclick="closeMessageModal()">&times;</button>
+                </div>
+                <div class="modal-field">
+                    <label>From:</label>
+                    <p id="modalName"></p>
+                </div>
+                <div class="modal-field">
+                    <label>Email:</label>
+                    <p id="modalEmail"></p>
+                </div>
+                <div class="modal-field">
+                    <label>Message:</label>
+                    <p id="modalMessage"></p>
+                </div>
             </div>
+        </div>
+
+        <script>
+            function openMessageModal(data) {
+                document.getElementById('modalName').textContent = data.name;
+                document.getElementById('modalEmail').textContent = data.email;
+                document.getElementById('modalMessage').textContent = data.message;
+                document.getElementById('messageModal').style.display = 'block';
+            }
+
+            function closeMessageModal() {
+                document.getElementById('messageModal').style.display = 'none';
+            }
+
+            window.onclick = function(event) {
+                const modal = document.getElementById('messageModal');
+                if (event.target === modal) {
+                    modal.style.display = 'none';
+                }
+            }
+        </script>
+
+        <section id="footer" class="admin-section">
+            <h2>Footer Settings</h2>
+            <form class="admin-form" action="{{ route('admin.settings.update', 'footer') }}" method="post">
+                @csrf
+                <label>Brand</label>
+                <input type="text" name="brand" value="{{ old('brand', $footer['brand']) }}" required />
+
+                <label>Year</label>
+                <input type="number" name="year" value="{{ old('year', $footer['year']) }}" required />
+
+                <label>Footer Text</label>
+                <textarea name="text" rows="2" required>{{ old('text', $footer['text']) }}</textarea>
+
+                <label>Link 1 label</label>
+                <input type="text" name="link1_label" value="{{ old('link1_label', $footer['links'][0]['label'] ?? '') }}" />
+                <label>Link 1 URL</label>
+                <input type="url" name="link1_url" value="{{ old('link1_url', $footer['links'][0]['url'] ?? '') }}" />
+
+                <label>Link 2 label</label>
+                <input type="text" name="link2_label" value="{{ old('link2_label', $footer['links'][1]['label'] ?? '') }}" />
+                <label>Link 2 URL</label>
+                <input type="url" name="link2_url" value="{{ old('link2_url', $footer['links'][1]['url'] ?? '') }}" />
+
+                <label>Link 3 label</label>
+                <input type="text" name="link3_label" value="{{ old('link3_label', $footer['links'][2]['label'] ?? '') }}" />
+                <label>Link 3 URL</label>
+                <input type="url" name="link3_url" value="{{ old('link3_url', $footer['links'][2]['url'] ?? '') }}" />
+
+                <button type="submit" class="button-primary">Save Footer</button>
+            </form>
         </section>
         </div><!-- .admin-content -->
     </main>
